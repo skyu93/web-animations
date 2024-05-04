@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico">
+    <title>Starfield</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .space {
+            width: 100vw;
+            height: 100vh;
+            background: black;
+        }
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            font-size: 0;
+            border-radius: 50%;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="space"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.2/web-animations-next.min.js" integrity="sha512-7/fijTA9Hz7UI8uTqERZ89YumtyKAO4QJ1IvsHCqr7SX26X8FrGDyn2+oMt571I0VeceUiA8WZxCBOZorHxB6Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module">
+        import Star from './src/Star.js';
+
+        const numberOfStars = 300
+        const space = document.querySelector('.space')
+        const centerPoint = () => {
+            return {
+                x: window.innerWidth * 0.5,
+                y: window.innerHeight * 0.5,
+            }
+        }
+        const starts = Array.from({ length: numberOfStars }).map((_,i) => new Star(space, i, centerPoint()))
+
+        const generateEffects = () => {
+            const options = {
+                duration: 1000,
+                iterations: Infinity,
+                fill: 'both',
+                easing: 'linear'
+            }
+
+            return starts.map(star => {
+                const z = Math.random() * window.innerHeight;
+                const duration = options.duration / (window.innerHeight / (window.innerHeight + z))
+                star.setupAnimation({
+                    x: window.innerWidth * 0.5,
+                    y: window.innerHeight * 0.5,
+                })
+
+                return new KeyframeEffect(star.el, [...star.keyframes], {
+                    ...options,
+                    duration
+                })
+            })
+        }
+
+        let animation = new Animation(new GroupEffect(generateEffects()), document.timeline)
+        animation.play()
+        window.addEventListener('resize', () => {
+            animation.cancel()
+            animation = new Animation(new GroupEffect(generateEffects()), document.timeline)
+            animation.play()
+        })
+    </script>
+</body>
+</html>
