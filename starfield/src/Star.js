@@ -18,16 +18,25 @@ export default class Star {
         this.el = document.createElement('div')
         this.el.classList.add('star')
         this.el.innerHTML = index
-        this.setupAnimation(point)
+        this.setupPoint(point)
         target.append(this.el)
     }
 
-    setupAnimation(point) {
+    setupPoint(point) {
         const [x, y, z] = getRandom3DPoint(point)
         this.pointFrom = calc3DPoint(point, x, y, z)
         this.pointTo = calc3DPoint(point, x, y, z - zModifier)
     }
-
+    generateEffect(point){
+        const z = Math.random() * window.innerHeight;
+        const duration = 1000 / (window.innerHeight / (window.innerHeight + z))
+        this.setupPoint(point)
+        return new KeyframeEffect(this.el, this.keyframes, {
+            duration,
+            iterations: 1,
+            easing: 'linear'
+        })
+    }
     get keyframes(){
         return [
             {
